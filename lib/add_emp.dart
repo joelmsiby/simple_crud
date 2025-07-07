@@ -19,6 +19,12 @@ class _AddEmpState extends State<AddEmp> with SingleTickerProviderStateMixin {
   //
   late AnimationController _shakeController;
   late Animation<double> _shakeAnimation;
+  //
+  bool isNameValid = false;
+  bool isAddressValid = false;
+  bool isEmailValid = false;
+  bool isContactValid = false;
+  bool isDateValid = false;
 
   @override
   void initState() {
@@ -78,22 +84,26 @@ class _AddEmpState extends State<AddEmp> with SingleTickerProviderStateMixin {
   //
 
   void validateForm() {
-    final name = nameController.text;
-    final address = addController.text;
-    final email = emailController.text;
-    final contact = contController.text;
+    final name = nameController.text.trim();
+    final address = addController.text.trim();
+    final email = emailController.text.trim();
+    final contact = contController.text.trim();
     final date = dateController.text.trim();
-
-    final currentlyValid =
-        name.isNotEmpty &&
-        address.isNotEmpty &&
-        isValidEmail(email) &&
-        isValidContact(contact) &&
-        date.isNotEmpty;
 
     // update form state
     setState(() {
-      isFormValid = currentlyValid;
+      isNameValid = name.isNotEmpty;
+      isAddressValid = address.isNotEmpty;
+      isEmailValid = isValidEmail(email);
+      isContactValid = isValidContact(contact);
+      isDateValid = date.isNotEmpty;
+
+      isFormValid =
+          isNameValid &&
+          isAddressValid &&
+          isEmailValid &&
+          isContactValid &&
+          isDateValid;
 
       // show errors if user has already attempted submission
       /* if (_showErrors && !currentlyValid) {
@@ -147,6 +157,9 @@ class _AddEmpState extends State<AddEmp> with SingleTickerProviderStateMixin {
                   errorText: _showErrors && nameController.text.trim().isEmpty
                       ? 'Name is required'
                       : null,
+                  suffixIcon: isNameValid
+                      ? const Icon(Icons.check, color: Colors.green)
+                      : null,
                 ),
                 onChanged: (value) => validateForm(),
                 textInputAction: TextInputAction.next,
@@ -161,6 +174,9 @@ class _AddEmpState extends State<AddEmp> with SingleTickerProviderStateMixin {
                   border: OutlineInputBorder(),
                   errorText: _showErrors && addController.text.trim().isEmpty
                       ? 'Address is required'
+                      : null,
+                  suffixIcon: isAddressValid
+                      ? const Icon(Icons.check, color: Colors.green)
                       : null,
                 ),
                 onChanged: (value) => validateForm(),
@@ -177,6 +193,9 @@ class _AddEmpState extends State<AddEmp> with SingleTickerProviderStateMixin {
                   border: OutlineInputBorder(),
                   errorText: _showErrors && emailController.text.trim().isEmpty
                       ? 'Email is required'
+                      : null,
+                  suffixIcon: isEmailValid
+                      ? const Icon(Icons.check, color: Colors.green)
                       : null,
                 ),
                 onChanged: (value) => validateForm(),
@@ -201,6 +220,9 @@ class _AddEmpState extends State<AddEmp> with SingleTickerProviderStateMixin {
                   errorText: _showErrors && contController.text.trim().isEmpty
                       ? 'Contact is required'
                       : null,
+                  suffixIcon: isContactValid
+                      ? const Icon(Icons.check, color: Colors.green)
+                      : null,
                 ),
                 onChanged: (value) => validateForm(),
                 textInputAction: TextInputAction.next,
@@ -213,10 +235,18 @@ class _AddEmpState extends State<AddEmp> with SingleTickerProviderStateMixin {
                 decoration: InputDecoration(
                   hintText: 'Date of Insert',
                   border: OutlineInputBorder(),
-                  suffixIcon: Icon(Icons.calendar_today),
+                  //suffixIcon: Icon(Icons.calendar_today),
                   errorText: _showErrors && dateController.text.trim().isEmpty
                       ? 'Date is required'
                       : null,
+                  suffixIcon: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (isDateValid)
+                        const Icon(Icons.check, color: Colors.green),
+                      const Icon(Icons.calendar_today),
+                    ],
+                  ),
                 ),
               ),
               Row(

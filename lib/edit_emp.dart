@@ -19,6 +19,12 @@ class _EditEmpState extends State<EditEmp> with SingleTickerProviderStateMixin {
   final FocusNode _focusNode = FocusNode();
   late final FocusNode _emailFocusNode = FocusNode();
   late final FocusNode _contFocusNode = FocusNode();
+  //
+  bool isNameValid = false;
+  bool isAddressValid = false;
+  bool isEmailValid = false;
+  bool isContactValid = false;
+  bool isDateValid = false;
 
   late final TextEditingController nameController = TextEditingController();
   late final TextEditingController addController = TextEditingController();
@@ -40,15 +46,14 @@ class _EditEmpState extends State<EditEmp> with SingleTickerProviderStateMixin {
     final contact = contController.text.trim();
     final date = dateController.text.trim();
 
-    final currentlyValid =
-        name.isNotEmpty &&
-        address.isNotEmpty &&
-        isValidEmail(email) &&
-        isValidContact(contact) &&
-        date.isNotEmpty;
-
     setState(() {
-      isFormValid = currentlyValid;
+      isNameValid = name.isNotEmpty;
+      isAddressValid = address.isNotEmpty;
+      isEmailValid = isValidEmail(email);
+      isContactValid = isValidContact(contact);
+      isDateValid = date.isNotEmpty;
+
+      isFormValid = isNameValid && isAddressValid && isEmailValid && isContactValid && isDateValid;
     });
   }
 
@@ -149,6 +154,9 @@ class _EditEmpState extends State<EditEmp> with SingleTickerProviderStateMixin {
                 errorText: _showErrors && nameController.text.trim().isEmpty
                     ? 'Name is required'
                     : null,
+                suffixIcon: isNameValid
+                  ? const Icon(Icons.check, color: Colors.green)
+                  : null,
               ),
               onChanged: (_) => validateForm(),
             ),
@@ -160,6 +168,9 @@ class _EditEmpState extends State<EditEmp> with SingleTickerProviderStateMixin {
                 border: const OutlineInputBorder(),
                 errorText: _showErrors && addController.text.trim().isEmpty
                     ? 'Address is required'
+                    : null,
+                suffixIcon: isAddressValid
+                  ? const Icon(Icons.check, color: Colors.green)
                     : null,
               ),
               onChanged: (_) => validateForm(),
@@ -174,6 +185,9 @@ class _EditEmpState extends State<EditEmp> with SingleTickerProviderStateMixin {
                 border: const OutlineInputBorder(),
                 errorText: _showErrors && emailController.text.trim().isEmpty
                     ? 'Email is required'
+                    : null,
+                suffixIcon: isEmailValid
+                  ? const Icon(Icons.check, color: Colors.green)
                     : null,
               ),
               onChanged: (_) => validateForm(),
@@ -196,6 +210,9 @@ class _EditEmpState extends State<EditEmp> with SingleTickerProviderStateMixin {
                 errorText: _showErrors && contController.text.trim().isEmpty
                     ? 'Contact is required'
                     : null,
+                suffixIcon: isContactValid
+                  ? const Icon(Icons.check, color: Colors.green)
+                    : null,
               ),
               onChanged: (_) => validateForm(),
             ),
@@ -206,10 +223,18 @@ class _EditEmpState extends State<EditEmp> with SingleTickerProviderStateMixin {
               decoration: InputDecoration(
                 hintText: 'Date of Insert',
                 border: const OutlineInputBorder(),
-                suffixIcon: const Icon(Icons.calendar_today),
+                //suffixIcon: const Icon(Icons.calendar_today),
                 errorText: _showErrors && dateController.text.trim().isEmpty
                     ? 'Date is required'
                     : null,
+                suffixIcon: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (isDateValid)
+                      const Icon(Icons.check, color: Colors.green),
+                    const Icon(Icons.calendar_today),
+                  ],
+                )
               ),
             ),
             const SizedBox(height: 20),
